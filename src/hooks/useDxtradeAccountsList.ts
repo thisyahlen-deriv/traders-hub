@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { useTradingPlatformAccounts } from '@deriv-com/api-hooks';
 import { CurrencyConstants, FormatUtils } from '@deriv-com/utils';
 
+import { CFDPlatforms } from '@/cfd';
+
 export const useDxtradeAccountsList = () => {
     const { data, ...rest } = useTradingPlatformAccounts({
         payload: { platform: 'dxtrade' },
@@ -12,12 +14,14 @@ export const useDxtradeAccountsList = () => {
 
     const modifiedAccounts = useMemo(() => {
         if (data) {
-            return data.map(
+            const dxtradeAccounts = data.trading_platform_accounts?.filter(
+                account => account.platform === CFDPlatforms.DXTRADE
+            );
+
+            return dxtradeAccounts?.map(
                 account =>
                     ({
                         ...account,
-                        /** The platform for the account */
-                        platform: 'dxtrade',
                         /** indicating whether the account is a virtual-money account. */
                         is_virtual: account.account_type === 'demo',
                         /** The balance of the account in currency format. */

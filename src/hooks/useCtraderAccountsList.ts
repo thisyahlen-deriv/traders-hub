@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { useTradingPlatformAccounts } from '@deriv-com/api-hooks';
 import { CurrencyConstants, FormatUtils } from '@deriv-com/utils';
 
+import { CFDPlatforms } from '@/cfd';
+
 export const useCtraderAccountsList = () => {
     const { data, ...rest } = useTradingPlatformAccounts({
         payload: { platform: 'ctrader' },
@@ -12,12 +14,14 @@ export const useCtraderAccountsList = () => {
 
     const modifiedAccounts = useMemo(() => {
         if (data) {
-            return data.map(
+            const ctraderAccounts = data.trading_platform_accounts?.filter(
+                account => account.platform === CFDPlatforms.CTRADER
+            );
+
+            return ctraderAccounts?.map(
                 account =>
                     ({
                         ...account,
-                        /** The platform for the account */
-                        platform: 'ctrader',
                         /** indicating whether the account is a virtual-money account. */
                         is_virtual: account.account_type === 'demo',
                         /** The login id for the account */
